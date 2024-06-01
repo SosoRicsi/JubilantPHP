@@ -1,12 +1,12 @@
 <?php 
     namespace Jubilant;
 
-    use App\Database;
-    use App\RandomString;
-    use App\PasswordHash;
-    use App\EmailSender;
-    use App\Superglobals\Session;
-    use App\Superglobals\Cookie;
+    use Jubilant\Database;
+    use Jubilant\RandomString;
+    use Jubilant\PasswordHash;
+    use Jubilant\EmailSender;
+    use Jubilant\Superglobals\Session;
+    use Jubilant\Superglobals\Cookie;
 
     class UserAuth {
         private $con;
@@ -54,51 +54,58 @@
             }
         }
 
-        public function registerUser(string $username, string $email, string $password, array $EmailServer, string $redirectURL, ?string $emailSender = null) {
-            if($this->createUsersTable()) {
-                if(empty($username)) {
-                    echo "Hiba! A felhasználónév mező nem lehet üres! <br>";
-                } else if(empty($email)) {
-                    echo "Hiba! Az email cím mező nem lehet üres! <br>";
-                } else if(empty($password)) {
-                    echo "Hiba! A jelszó mező nem lehet üres! <br>";
-                } else {
-                    if($this->con->select("users", "*","`email`='$email'")) {
-                        echo "Ez az email cím ($email) már használatban van! <br>";
+        public function registerUser(string $username, string $email, string $password, string $sessionid, array $EmailServer, string $redirectURL, ?string $emailSender = null) {
+            $Session = new Session();
+            if($sessionid == $_COOKIE['PHPSESSID']) {
+                if($this->createUsersTable()) {
+                    if(empty($username)) {
+                        echo "Hiba! A felhasználónév mező nem lehet üres! <br>";
+                    } else if(empty($email)) {
+                        echo "Hiba! Az email cím mező nem lehet üres! <br>";
+                    } else if(empty($password)) {
+                        echo "Hiba! A jelszó mező nem lehet üres! <br>";
                     } else {
-                        $PasswordHash = new PasswordHash();
-                        $RandomString = new RandomString();
-        
-                        $hashedPassword = $PasswordHash->passwordHash($password);
-                        $customID = $RandomString->generateCustomString('ucid',3,5);
-        
-                        if($this->con->insert("users",array("$customID","$username","$email","$hashedPassword","pending"),array("customID","username","email","password","status"))) {
-                            
-                            if($emailSender == null) {
-                                $EmailSender = new EmailSender($EmailServer[0],$EmailServer[1],$EmailServer[2],$EmailServer[3],$EmailServer[4]);
-                            } else {
-                                $EmailSender = new EmailSender($EmailServer[0],$EmailServer[1],$EmailServer[2],$EmailServer[3],$EmailServer[4],$emailSender);
+                        if($this->con->select("users", "*","`email`='$email'")) {
+                            echo "Ez az email cím ($email) már használatban van! <br>";
+                        } else {
+                            $PasswordHash = new PasswordHash();
+                            $RandomString = new RandomString();
+            
+                            $hashedPassword = $PasswordHash->passwordHash($password);
+                            $customID = $RandomString->generateCustomString('ucid',3,5);
+            
+                            if($this->con->insert("users",array("$customID","$username","$email","$hashedPassword","pending"),array("customID","username","email","password","status"))) {
+                                
+                                if($emailSender == null) {
+                                    $EmailSender = new EmailSender($EmailServer[0],$EmailServer[1],$EmailServer[2],$EmailServer[3],$EmailServer[4]);
+                                } else {
+                                    $EmailSender = new EmailSender($EmailServer[0],$EmailServer[1],$EmailServer[2],$EmailServer[3],$EmailServer[4],$emailSender);
+                                }
+                                $Template = new Template(__DIR__.'/../public/templates/emailTemplates/welcomeNewUser.html');
+                                $date = date("Y-m-d H:i:s");
+                                $Template->setVariables(['username'=>$username,'email'=>$email,'registerDate'=>$date,'customID'=>$customID]);
+                                if($EmailSender->sendMail($email,'Regisztráció megerősítés',$Template->render())) {
+                                    echo "Sikeres regisztráció! <br>";
+                                } else {
+                                    $this->con->delete("users","`email`='$email' AND `customID`='$customID'");
+                                    echo "Sikertelen regisztráció!";
+                                }
+    
+                                return true;
                             }
-                            $Template = new Template(__DIR__.'/../templates/emailTemplates/welcomeNewUser.phtml');
-                            $date = date("Y-m-d H:i:s");
-                            $Template->setVariables(['username'=>$username,'email'=>$email,'registerDate'=>$date,'customID'=>$customID]);
-                            if($EmailSender->sendMail($email,'Regisztráció megerősítés',$Template->render())) {
-                                echo "Sikeres regisztráció! <br>";
-                            } else {
-                                $this->con->delete("users","`email`='$email' AND `customID`='$customID'");
-                                echo "Sikertelen regisztráció!";
-                            }
-
-                            return true;
                         }
                     }
                 }
+            } else {
+                echo "A küldött <i>php session id</i> nem egyezik meg a valós értékkel!";
             }
 
+            $Session->regenerate();
 
         }
 
         public function loginUser(string $email, string $password, string $sessionID, array $EmailServer = null, ?string $emailSender = null) {
+            $Session = new Session();
             if($this->createLastLoginsTable()) {
                 if($sessionID === $_COOKIE['PHPSESSID']) {
                     $PasswordHash = new PasswordHash();
@@ -107,7 +114,6 @@
                     
                     if($selectUserDatas) {
                         if($PasswordHash->passwordVerify($password, $selectUserDatas[0]['password'])) {
-                            $Session = new Session();
         
                             $Session->set('customID', $selectUserDatas[0]['customID']);
                             $Session->set('username', $selectUserDatas[0]['username']);
@@ -121,7 +127,6 @@
     
                             if($this->con->select("lastLogins","*","`userCustomID`='$customID' AND `sessionBrowser`='$userBrowser'")) {
                                 echo "Sikeres bejelentkezés! <br>";
-                                $Session->regenerate();
                                 return true;
                             } else {
                                 $userIP = $_SERVER['REMOTE_ADDR'];
@@ -140,8 +145,8 @@
                                         $date = date("Y-m-d H:i:s");
                                         $body = "Tisztelt ".$Session->get('username')."! Új eszközről való bejelentkezést észleltünk! <br>Eszköz adatai: <br> <ul><li><b>Webböngésző:</b> $userBrowser</li><li><b>IP cím:</b> $userIP</li><li><b>Időpont:</b> $date</li></ul><br>Nem én voltam, <a href='/dashboard/account/changePassword'>megváltoztatom a jelszavamat!</a>";
                                         if($EmailSender->sendMail($to, $subject, $body)) {
-                                            $Session->regenerate();
                                             echo "Sikeres bejelentkezés! <br>";
+                                            $Session->regenerate();
                                             return true;
                                         }
                                     }
@@ -162,6 +167,8 @@
     
                 return true;
             }
+
+            $Session->regenerate();
     
         }
         
@@ -176,11 +183,13 @@
                     } else {
                         $EmailSender = new EmailSender($EmailServer[0],$EmailServer[1],$EmailServer[2],$EmailServer[3],$EmailServer[4], $emailSender);
                     }
-                    $to = $email;
-                    $subject = 'Jelszó megváltoztatás';
-                    $body = "Tisztelt felhasználó! A jelszava sikeresen megváltozott!";
+                    $Template = new Template(__DIR__.'/../public/templates/emailTemplates/passwordChange.html');
+                    $Template->setVariables([
+                        'email' => $email,
+                        'date'  => date("Y-m-d H:i:s")
+                    ]);
 
-                    $EmailSender->sendMail($to, $subject, $body);
+                    $EmailSender->sendMail($email, 'Jelszó megváltoztatás', $Template->render());
                     echo "A jelszó sikeresen megváltoztatva! <br>";
                     return true;
                 } else {

@@ -8,7 +8,7 @@
 
         private $mailer;
 
-        public function __construct($host, $username, $password, $port, $senderEmail, $senderName = 'BasicPHP EmailSender system') {
+        public function __construct($host, $username, $password, $port, $senderEmail, $senderName = 'JubilantPHP EmailSender system') {
             $this->mailer = new PHPMailer(true);
 
             $this->mailer->isSMTP();
