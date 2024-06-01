@@ -81,7 +81,7 @@
                                 } else {
                                     $EmailSender = new EmailSender($EmailServer[0],$EmailServer[1],$EmailServer[2],$EmailServer[3],$EmailServer[4],$emailSender);
                                 }
-                                $Template = new Template(__DIR__.'/../public/templates/emailTemplates/welcomeNewUser.html');
+                                $Template = new Template(__DIR__.'/../public/templates/emailTemplates/welcomeNewUser.php');
                                 $date = date("Y-m-d H:i:s");
                                 $Template->setVariables(['username'=>$username,'email'=>$email,'registerDate'=>$date,'customID'=>$customID]);
                                 if($EmailSender->sendMail($email,'Regisztráció megerősítés',$Template->render())) {
@@ -183,7 +183,7 @@
                     } else {
                         $EmailSender = new EmailSender($EmailServer[0],$EmailServer[1],$EmailServer[2],$EmailServer[3],$EmailServer[4], $emailSender);
                     }
-                    $Template = new Template(__DIR__.'/../public/templates/emailTemplates/passwordChange.html');
+                    $Template = new Template(__DIR__.'/../public/templates/emailTemplates/passwordChange.php');
                     $Template->setVariables([
                         'email' => $email,
                         'date'  => date("Y-m-d H:i:s")
