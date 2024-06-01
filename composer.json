@@ -1,0 +1,20 @@
+{
+    "name": "jubilant/jubilantphp",
+    "description": "A very simple PHP framework for simle web apps.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Jubilant\\": "App/src/",
+            "Jubilant\\Superglobals\\": "App/src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "SosoRicsi",
+            "email": "matekzsenikem@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
