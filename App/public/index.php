@@ -8,6 +8,7 @@
 
     $Router = new Router();
     $Template = new Template();
+    $Session = new Session();
 
     $Template->setDirectory('/',__DIR__.'/templates/views/index.view.html');
     $Template->setDirectory('/register',__DIR__.'/templates/views/register.view.html');
