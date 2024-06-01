@@ -10,10 +10,10 @@
     $Template = new Template();
     $Session = new Session();
 
-    $Template->setDirectory('/',__DIR__.'/templates/views/index.view.html');
-    $Template->setDirectory('/register',__DIR__.'/templates/views/register.view.html');
-    $Template->setDirectory('/login', __DIR__.'/templates/views/login.view.html');
-    $Template->setDirectory('/dashboard/account', __DIR__.'/templates/views/dashboard/account.view.html');
+    $Template->setDirectory('/',__DIR__.'/templates/views/index.view.php');
+    $Template->setDirectory('/register',__DIR__.'/templates/views/register.view.php');
+    $Template->setDirectory('/login', __DIR__.'/templates/views/login.view.php');
+    $Template->setDirectory('/dashboard/account', __DIR__.'/templates/views/dashboard/account.view.php');
 
     $Router->get('/',$Template->getDirectory('/'), function ($params, $Template) {
         $Template->setVariables([
