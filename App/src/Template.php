@@ -28,8 +28,20 @@
             foreach ($this->variables as $key => $value) {
                 $content = str_replace("{{".$key."}}", htmlspecialchars($value, ENT_QUOTES, 'UTF-8'), $content);
             }
+            $if = $content = preg_replace('/@if\(\s*(.+?)\s*\)/', '<?php if($1): ?>', $content);
+            $if = $content = preg_replace('/@if \(\s*(.+?)\s*\)/', '<?php if($1): ?>', $content);
+            if($if != '') {
+                $content = preg_replace('/@elseif\(\s*(.+?)\s*\)/', '<?php elseif($1): ?>', $content);
+                $content = preg_replace('/@elseif \(\s*(.+?)\s*\)/', '<?php elseif($1): ?>', $content);
+                $content = str_replace('@else', '<?php else: ?>', $content);
+                $content = str_replace('@endif', '<?php endif; ?>', $content);
+            }
 
-            return $content;
+            ob_start();
+            eval('?>'.$content);
+            $final = ob_get_clean();
+
+            return $final;
         }
     }
 ?>
