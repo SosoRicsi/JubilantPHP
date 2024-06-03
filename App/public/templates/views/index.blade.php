@@ -7,5 +7,8 @@
     </head>
     <body>
         
+        @template('login.blade.php', array('title'=>'főoldal'))
+
+        @template('register.blade.php')
     </body>
 </html>
