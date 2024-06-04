@@ -15,7 +15,7 @@
     $Template->setDirectory('/','index.blade.php');
     $Template->setDirectory('/register', 'register.blade.php');
     $Template->setDirectory('/login', 'login.blade.php');
-    $Template->setDirectory('/dashboard/account', 'account.blade.php');
+    $Template->setDirectory('/dashboard/account', 'dashboard/account.blade.php');
 
     $Router->get('/', $Template->getDirectory('/'), function ($params, $Template) {
         $Template->setVariables([
@@ -48,8 +48,7 @@
         $password = $_POST['password'];
         $sessionid = $_POST['session_id'];
 
-        $EmailServer = ['smtp.example.com','sb@example.com','email password','port(587)','sender email'];
-        $UserAuth->registerUser($username, $email, $password, $sessionid, $EmailServer,'/');
+        $UserAuth->registerUser($username, $email, $password, $sessionid);
     });
     $Router->get('/execute/register/authenticate/{customid}', null, function ($params) {
         $UserAuth = new UserAuth();
@@ -73,9 +72,7 @@
         $password = $_POST['password'];
         $session_id = $_POST['session_id'];
 
-        $EmailServer = ['smtp.example.com','sb@example.com','email password','port(587)','sender email'];
-
-        if($UserAuth->loginUser($email, $password, $session_id,$EmailServer)) {
+        if($UserAuth->loginUser($email, $password, $session_id)) {
             echo "<script>window.location.href='/dashboard/account'</script>";
         }
     });
@@ -85,6 +82,10 @@
         $Template->setVariables([
             'username'=>$Session->get('username')
         ]);
+    });
+    $Router->get('/dashboard/account/logout', null, function() {
+        $Session = new Session();
+        $Session->destroy();
     });
 
     $Router->add404Handler(function () {

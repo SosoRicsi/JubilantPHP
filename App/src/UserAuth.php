@@ -57,7 +57,7 @@
             }
         }
 
-        public function registerUser(string $username, string $email, string $password, string $sessionid, array $EmailServer, string $redirectURL, ?string $emailSender = null) {
+        public function registerUser(string $username, string $email, string $password, string $sessionid,) {
             require __DIR__.'/../settings.php';
             $Session = new Session();
             if($sessionid == $_COOKIE['PHPSESSID']) {
@@ -81,16 +81,17 @@
                             $customID = $RandomString->generateCustomString('ucid',3,5);
             
                             if($this->con->insert("users",array("$customID","$username","$email","$hashedPassword","pending"),array("customID","username","email","password","status"))) {
-                                
-                                if($emailSender == null) {
-                                    $EmailSender = new EmailSender($EmailServer[0],$EmailServer[1],$EmailServer[2],$EmailServer[3],$EmailServer[4]);
-                                } else {
-                                    $EmailSender = new EmailSender($EmailServer[0],$EmailServer[1],$EmailServer[2],$EmailServer[3],$EmailServer[4],$emailSender);
-                                }
+                                $EmailSender = new EmailSender($EmailServer[0],$EmailServer[1],$EmailServer[2],$EmailServer[3],$EmailServer[4]);
                                 $Template = new Template(__DIR__.'/../public/templates/emailTemplates/welcomeNewUser.php');
                                 $date = date("Y-m-d H:i:s");
-                                $Template->setVariables(['username'=>$username,'email'=>$email,'registerDate'=>$date,'customID'=>$customID]);
-                                if($EmailSender->sendMail($email,'Regisztráció megerősítés',$Template->render())) {
+                                $Template->setVariables([
+                                    'username'      => $username,
+                                    'email'         => $email,
+                                    'registerDate'  => $date,
+                                    'customID'      => $customID,
+                                    'subject'       => $subjectForRegistration
+                                ]);
+                                if($EmailSender->sendMail($email,$subjectForRegistration,$Template->render())) {
                                     echo $registeredSuccessfully;
                                 } else {
                                     $this->con->delete("users","`email`='$email' AND `customID`='$customID'");
@@ -110,7 +111,7 @@
 
         }
 
-        public function loginUser(string $email, string $password, string $sessionID, array $EmailServer = null, ?string $emailSender = null) {
+        public function loginUser(string $email, string $password, string $sessionID) {
             require __DIR__.'/../settings.php';
             $Session = new Session();
             if($this->createLastLoginsTable()) {
@@ -133,7 +134,7 @@
                             $userBrowser = $_SERVER['HTTP_USER_AGENT'];
     
                             if($this->con->select("lastLogins","*","`userCustomID`='$customID' AND `sessionBrowser`='$userBrowser'")) {
-                                echo "Sikeres bejelentkezés! <br>";
+                                echo $userLoginSuccessfully;
                                 return true;
                             } else {
                                 $userIP = $_SERVER['REMOTE_ADDR'];
@@ -141,18 +142,20 @@
     
                                 if($this->con->insert("lastLogins",array($customID,$sessionID,$userIP,$userBrowser),array("userCustomID","sessionID","sessionIP","sessionBrowser"))) {
                                     if($EmailServer != null) {
-                                        if($emailSender == null) {
-                                            $EmailSender = new EmailSender($EmailServer[0],$EmailServer[1],$EmailServer[2],$EmailServer[3],$EmailServer[4]);
-                                        } else {
-                                            $EmailSender = new EmailSender($EmailServer[0],$EmailServer[1],$EmailServer[2],$EmailServer[3],$EmailServer[4],$emailSender);
-                                        }
+                                        $EmailSender = new EmailSender($EmailServer[0],$EmailServer[1],$EmailServer[2],$EmailServer[3],$EmailServer[4]);
     
-                                        $to = $email;
-                                        $subject = 'Új eszközről való bejelentkezés';
-                                        $date = date("Y-m-d H:i:s");
-                                        $body = "Tisztelt ".$Session->get('username')."! Új eszközről való bejelentkezést észleltünk! <br>Eszköz adatai: <br> <ul><li><b>Webböngésző:</b> $userBrowser</li><li><b>IP cím:</b> $userIP</li><li><b>Időpont:</b> $date</li></ul><br>Nem én voltam, <a href='/dashboard/account/changePassword'>megváltoztatom a jelszavamat!</a>";
-                                        if($EmailSender->sendMail($to, $subject, $body)) {
-                                            echo "Sikeres bejelentkezés! <br>";
+                                        $Template = new Template(__DIR__.'/../public/templates/emailTemplates/loginFromNewDevice.php');
+                                        $Template->setVariables([
+                                            'username'  => $selectUserDatas[0]['username'],
+                                            'browser'   => $userBrowser,
+                                            'ip'        => $userIP,
+                                            'date'      => date("Y-m-d H:i:s"),
+                                            'subject'   => $subjectForLoginFromNewDevice
+                                        ]);
+
+                                        $subject = $subjectForLoginFromNewDevice;
+                                        if($EmailSender->sendMail($email, $subject, $Template->render())) {
+                                            echo $userLoginSuccessfully;
                                             $Session->regenerate();
                                             return true;
                                         }
@@ -179,25 +182,22 @@
     
         }
         
-        public function changePassword(string $email, string $newPassword, string $sessionID,array $EmailServer, ?string $emailSender = null) {
+        public function changePassword(string $email, string $newPassword, string $sessionID,) {
             require __DIR__.'/../settings.php';
             $Session = new Session();
             if ($sessionID == $_COOKIE['PHPSESSID']) {
                 $PasswordHash = new PasswordHash();
                 $hashedPassword = $PasswordHash->passwordHash($newPassword);
                 if($this->con->update("users",array("password"=>$hashedPassword),array("email"=>$email))) {
-                    if($emailSender == null) {
                         $EmailSender = new EmailSender($EmailServer[0],$EmailServer[1],$EmailServer[2],$EmailServer[3],$EmailServer[4]);
-                    } else {
-                        $EmailSender = new EmailSender($EmailServer[0],$EmailServer[1],$EmailServer[2],$EmailServer[3],$EmailServer[4], $emailSender);
-                    }
                     $Template = new Template(__DIR__.'/../public/templates/emailTemplates/passwordChange.php');
                     $Template->setVariables([
-                        'email' => $email,
-                        'date'  => date("Y-m-d H:i:s")
+                        'email'     => $email,
+                        'date'      => date("Y-m-d H:i:s"),
+                        'subject'   => $subjectForPasswordchange
                     ]);
 
-                    $EmailSender->sendMail($email, 'Jelszó megváltoztatás', $Template->render());
+                    $EmailSender->sendMail($email, $subjectForPasswordchange, $Template->render());
                     echo $passwordSuccessfullyChanged;
                     return true;
                 } else {

@@ -11,12 +11,13 @@
         private array $allowedFileTypes = [];
         
         public function __construct(string $targetDirectory, array $allowedFileTypes = ["jpg", "png", "gif"], $maxFileSize = 500000) {
+            require __DIR__.'/../settings.php';
             if($targetDirectory != null) {
                 $this->targetDirectory = $targetDirectory;
                 $this->allowedFileTypes = $allowedFileTypes;
                 $this->maxFileSize = $maxFileSize;
             } else {
-                echo "Nincs megadva a feltöltési hely!";
+                echo $emptyUploadDirectory;
             }
         }
         
@@ -48,11 +49,11 @@
             $fileType = strtolower(pathinfo($file["name"], PATHINFO_EXTENSION));
 
             if($file["size"] > $this->maxFileSize) {
-                echo "A fájl mérete nagyobb a megengedettnél! Maxmimum ".$this->maxFileSize."!";
+                echo $tooBigFilesize;
                 return false;
             }
             if(!in_array($fileType, $this->allowedFileTypes)) {
-                echo "A fájl formátuma nem megfelelő! Csak ".implode(", ", $this->allowedFileTypes)." megengedett!";
+                echo $inaptFileFormat;
                 return false;
             }
 
@@ -72,9 +73,9 @@
             }
 
             if(move_uploaded_file($file["tmp_name"], $targetFile)) {
-                echo "A fájl sikeresen feltöltve! ".basename($targetFile);
+                echo $fileUploadedSuccessfully;
             } else {
-                echo "A fájl feltöltése sikertelen!";
+                echo $fileUploadedUnsuccessfully;
             }
 
             return true;
