@@ -4,21 +4,34 @@
     use Jubilant\Router;
     use Jubilant\Template;
     use Jubilant\UserAuth;
+    use Jubilant\FileUpload;
+    use Jubilant\RandomString;
     use Jubilant\Superglobals\Session;
 
     $Router = new Router();
     $Template = new Template();
     $Session = new Session();
 
-    $Template->setDirectory('/',__DIR__.'/templates/views/index.blade.php');
-    $Template->setDirectory('/register',__DIR__.'/templates/views/register.blade.php');
-    $Template->setDirectory('/login', __DIR__.'/templates/views/login.blade.php');
-    $Template->setDirectory('/dashboard/account', __DIR__.'/templates/views/dashboard/account.blade.php');
+    $Template->setDirectory('/','index.blade.php');
+    $Template->setDirectory('/register', 'register.blade.php');
+    $Template->setDirectory('/login', 'login.blade.php');
+    $Template->setDirectory('/dashboard/account', 'account.blade.php');
 
-    $Router->get('/',$Template->getDirectory('/'), function ($params, $Template) {
+    $Router->get('/', $Template->getDirectory('/'), function ($params, $Template) {
         $Template->setVariables([
             'title'=>"Főoldal"
         ]);
+    });
+
+    $Router->post('/uploadImage', function () {
+        echo "<pre>";
+        $file = $_FILES["fileToUpload"];
+        print_r($file);
+        print_r($_FILES);
+        $UploadFiles = new FileUpload(__DIR__.'/images/');
+        $RandomString = new RandomString();
+        $fileID = $RandomString->generateCustomString('file',2,3);
+        $UploadFiles->upload($file,true,true,$fileID);
     });
 
     $Router->get('/register', $Template->getDirectory('/register'), function ($params, $Template) {
@@ -28,7 +41,7 @@
         ]);
     });
     $Router->post('/execute/register', function () {
-        $UserAuth = new UserAuth("host","username","password","database_name");
+        $UserAuth = new UserAuth();
 
         $username = $_POST['username'];
         $email = $_POST['email'];
@@ -39,7 +52,7 @@
         $UserAuth->registerUser($username, $email, $password, $sessionid, $EmailServer,'/');
     });
     $Router->get('/execute/register/authenticate/{customid}', null, function ($params) {
-        $UserAuth = new UserAuth("host","username","password","database_name");
+        $UserAuth = new UserAuth();
         $userID = $params['customid'];
 
         if($UserAuth->confAuth($userID)) {
@@ -54,7 +67,7 @@
         ]);
     });
     $Router->post('/execute/login', function () {
-        $UserAuth = new UserAuth("host","username","password","database_name");
+        $UserAuth = new UserAuth();
 
         $email = $_POST['email'];
         $password = $_POST['password'];

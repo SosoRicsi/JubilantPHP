@@ -1,18 +1,20 @@
 <?php 
     namespace Jubilant;
 
+    
     class Database {
         private $db_host = '';
         private $db_user = '';
         private $db_pass = '';
         private $db_name = '';
         private $con = '';
-
-        public function __construct($db_host, $db_user, $db_pass, $db_name) {
-            $this->db_host = $db_host;
-            $this->db_user = $db_user;
-            $this->db_pass = $db_pass;
-            $this->db_name = $db_name;
+        
+        public function __construct() {
+            require __DIR__.'/../settings.php';
+            $this->db_host = $DatabaseConnection[0];
+            $this->db_user = $DatabaseConnection[1];
+            $this->db_pass = $DatabaseConnection[2];
+            $this->db_name = $DatabaseConnection[3];
         }
 
         public function connect() {

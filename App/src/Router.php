@@ -11,7 +11,7 @@
         private const METHOD_POST = 'POST';
         private const METHOD_GET = 'GET';
 
-        public function get(string $path, ?string $template, $handler): void {
+        public function get(string $path, $template, $handler): void {
             $this->addHandler(self::METHOD_GET, $path, $template, $handler);
         }
 

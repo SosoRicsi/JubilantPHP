@@ -12,12 +12,14 @@
         private $con;
 
 
-        public function __construct($db_host, $db_user, $db_pass, $db_name) {
-            $this->con = new Database($db_host, $db_user, $db_pass, $db_name);
+        public function __construct() {
+            require __DIR__.'/../settings.php';
+            $this->con = new Database($DatabaseConnection[0], $DatabaseConnection[1], $DatabaseConnection[2], $DatabaseConnection[3]);
             $this->con->connect();
         }
 
         private function createUsersTable() {
+            require __DIR__.'/../settings.php';
             $query = "CREATE TABLE IF NOT EXISTS users(
                 ID INT AUTO_INCREMENT PRIMARY KEY,
                 customID VARCHAR(255) NOT NULL,
@@ -31,12 +33,13 @@
             if($this->con->getConnection()->query($query)) {
                 return true;
             } else {
-                echo "Nem sikerült létrehozni a <u><i>felhasználók</i></u> táblát! ".$this->con->error."<br>";
+                echo $cantCreateUsersTable.$this->con->error."<br>";
                 return false;
             }
         }
 
         private function createLastLoginsTable() {
+            require __DIR__.'/../settings.php';
             $query  = "CREATE TABLE IF NOT EXISTS lastLogins(
                 ID INT AUTO_INCREMENT PRIMARY KEY,
                 userCustomID VARCHAR(255) NOT NULL,
@@ -49,24 +52,27 @@
             if($this->con->getConnection()->query($query)) {
                 return true;
             } else {
-                echo "Nem sikerült létrehozni az <u><i>új bejelentkezések</i></u> táblát! ".$this->con->error."<br>";
+                echo $cantCreateLastloginsTable.$this->con->error."<br>";
                 return false;
             }
         }
 
         public function registerUser(string $username, string $email, string $password, string $sessionid, array $EmailServer, string $redirectURL, ?string $emailSender = null) {
+            require __DIR__.'/../settings.php';
             $Session = new Session();
             if($sessionid == $_COOKIE['PHPSESSID']) {
                 if($this->createUsersTable()) {
                     if(empty($username)) {
-                        echo "Hiba! A felhasználónév mező nem lehet üres! <br>";
+                        echo $emptyUsernameInput;
                     } else if(empty($email)) {
-                        echo "Hiba! Az email cím mező nem lehet üres! <br>";
+                        echo $emptyEmailInput;
                     } else if(empty($password)) {
-                        echo "Hiba! A jelszó mező nem lehet üres! <br>";
+                        echo $emptyPasswordInput;
+                    } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                        echo $notValidEmail;
                     } else {
                         if($this->con->select("users", "*","`email`='$email'")) {
-                            echo "Ez az email cím ($email) már használatban van! <br>";
+                            echo $emailAlredyUsed;
                         } else {
                             $PasswordHash = new PasswordHash();
                             $RandomString = new RandomString();
@@ -85,10 +91,10 @@
                                 $date = date("Y-m-d H:i:s");
                                 $Template->setVariables(['username'=>$username,'email'=>$email,'registerDate'=>$date,'customID'=>$customID]);
                                 if($EmailSender->sendMail($email,'Regisztráció megerősítés',$Template->render())) {
-                                    echo "Sikeres regisztráció! <br>";
+                                    echo $registeredSuccessfully;
                                 } else {
                                     $this->con->delete("users","`email`='$email' AND `customID`='$customID'");
-                                    echo "Sikertelen regisztráció!";
+                                    echo $registeredUnsuccessfully;
                                 }
     
                                 return true;
@@ -97,7 +103,7 @@
                     }
                 }
             } else {
-                echo "A küldött <i>php session id</i> nem egyezik meg a valós értékkel!";
+                echo $invalidPHPsessionID;
             }
 
             $Session->regenerate();
@@ -105,6 +111,7 @@
         }
 
         public function loginUser(string $email, string $password, string $sessionID, array $EmailServer = null, ?string $emailSender = null) {
+            require __DIR__.'/../settings.php';
             $Session = new Session();
             if($this->createLastLoginsTable()) {
                 if($sessionID === $_COOKIE['PHPSESSID']) {
@@ -153,15 +160,15 @@
                                 }
                             }
                         } else {
-                            echo "Helytelen jelszó! <br>";
+                            echo $invalidPassword;
                             return false;
                         }
                     } else {
-                        echo "Nem található ilyen fiók, vagy több van ezekkel az adatokkal, így nem lehet beazonosítani. <br>";
+                        echo $userNotFound;
                         return false;
                     }
                 } else {
-                    echo "Biztonsági rés: a küldött php session_id nem egyezik meg a valós értékkel! <br>";
+                    echo $invalidPHPsessionID;
                     return false;
                 }
     
@@ -173,6 +180,7 @@
         }
         
         public function changePassword(string $email, string $newPassword, string $sessionID,array $EmailServer, ?string $emailSender = null) {
+            require __DIR__.'/../settings.php';
             $Session = new Session();
             if ($sessionID == $_COOKIE['PHPSESSID']) {
                 $PasswordHash = new PasswordHash();
@@ -190,14 +198,14 @@
                     ]);
 
                     $EmailSender->sendMail($email, 'Jelszó megváltoztatás', $Template->render());
-                    echo "A jelszó sikeresen megváltoztatva! <br>";
+                    echo $passwordSuccessfullyChanged;
                     return true;
                 } else {
-                    echo "A jelszót nem sikerült megváltoztatni! Kérjük próbálja újra később! <br>";
+                    echo $passwordUnsuccessfullyChanged;
                     return false;
                 }
             } else {
-                echo "Biztonsági rés: a küldött php session_id nem egyezik meg a valós értékkel! <br>";
+                echo $invalidPHPsessionID;
                 return false;
             }
 
@@ -206,16 +214,20 @@
         }
 
         public function confAuth(string $customID) {
+            require __DIR__.'/../settings.php';
             if($this->con->select("users","*","`customID`='$customID' AND `status`='pending'")) {
                 if($this->con->update("users",array('status'=>"confirmed"),array('customID'=>$customID))) {
-                    echo "Felhasználó megerősítve! <br>";
-                    return true;
+                    echo $userConfirmedSuccessfully;
                 } else {
-                    throw new Exceception("Something went wrong while updating the user's status: ".$this->con->error);
+                    echo $userConfirmedUnsuccessfully;
+                    return false;
                 }
             } else {
-                echo "Nem található felhasználó! <br>";
+                echo $userNotFound;
+                return false;
             }
+
+            return true;
         }
 
     }

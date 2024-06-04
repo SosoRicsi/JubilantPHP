@@ -15,7 +15,7 @@ class Template {
     }
 
     public function setDirectory(string $route, string $directory) {
-        $this->directory[$route] = $directory;
+        $this->directory[$route] = __DIR__.'/../public/templates/views/'.$directory;
     }
 
     public function getDirectory(string $route) {

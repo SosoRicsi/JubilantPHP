@@ -21,7 +21,7 @@
         public function generateCustomString(string $prefix = null, int $sectionNum = 3, int $sectionLenght = 5) {
             for ($i = 0; $i < $sectionNum; $i++) {
                 $this->customid .= $this->generateRandomChars($sectionLenght);
-                if ($i < $sectionNum - 1) { // Csak akkor adja hozzá a "-" jelet, ha nem az utolsó iteráció
+                if ($i < $sectionNum - 1) {
                     $this->customid .= "-";
                 }
             }
