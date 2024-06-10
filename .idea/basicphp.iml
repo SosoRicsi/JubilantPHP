@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="WEB_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/App/src" isTestSource="false" packagePrefix="Jubilant\" />
+      <sourceFolder url="file://$MODULE_DIR$/App/src/bin" isTestSource="false" packagePrefix="Jubilant\commands\" />
+      <sourceFolder url="file://$MODULE_DIR$/App/src/superglobs" isTestSource="false" packagePrefix="Jubilant\Superglobals\" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/oyejorge/less.php" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpmailer/phpmailer" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
