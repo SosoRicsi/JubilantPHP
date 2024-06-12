@@ -14,17 +14,6 @@ class MigrationManager {
         $this->migrationsPath = $migrationsPath;
     }
 
-    private function createMigrationsTable() {
-        $query = "CREATE TABLE IF NOT EXISTS migrations(
-            ID INT AUTO_INCREMENT PRIMARY KEY,
-            migration VARCHAR(255),
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )";
-
-        $this->db->connect();
-        $this->db->getConnection()->query($query);
-    }
-
     private function getMigrations() {
         $files = glob($this->migrationsPath . '/*.php');
         usort($files, function ($a, $b) {
@@ -64,7 +53,6 @@ class MigrationManager {
     }
 
     public function migrate() {
-        $this->createMigrationsTable();
         $migrations = $this->getMigrations();
 
         foreach ($migrations as $migration) {
@@ -73,7 +61,6 @@ class MigrationManager {
     }
 
     public function rollback() {
-        $this->createMigrationsTable();
         $migrations = $this->getAppliedMigrations();
 
         if (!empty($migrations)) {

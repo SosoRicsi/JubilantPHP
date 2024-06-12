@@ -48,3 +48,10 @@
     $inaptFileFormat                    = "Nem megfelelő fájl típus! <br>";
     $fileUploadedSuccessfully           = "A fájl sikeresen feltöltésre került! <br>";
     $fileUploadedUnsuccessfully         = "A fájlt nem sikerült feltölteni! <br>";
+
+                                                    /* Email sender */
+    $emailSuccessfullySent              = "E-mail sikeresen elküldve! <br>";
+    $cantSendEmail                      = "Nem sikerült elküldeni az email-t: ";
+
+                                                    /* Less compiler */
+    $pathDoesntExists                   = "A megadott elérési út nem létezik: ";

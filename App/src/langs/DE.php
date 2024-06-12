@@ -48,3 +48,10 @@
     $inaptFileFormat                    = "Ungültiges Dateiformat! <br>";
     $fileUploadedSuccessfully           = "Die Datei wurde erfolgreich hochgeladen! <br>";
     $fileUploadedUnsuccessfully         = "Die Datei konnte nicht hochgeladen werden! <br>";
+
+                                                    /* Email sender */
+    $emailSuccessfullySent              = "E-Mail erfolgreich gesendet! <br>";
+    $cantSendEmail                      = "E-Mail konnte nicht gesendet werden: ";
+
+                                                    /* Less compiler */
+    $pathDoesntExists                   = "Der angegebene Pfad existiert nicht: ";
