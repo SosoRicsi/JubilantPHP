@@ -20,6 +20,10 @@
                     $manager->rollback();
                     echo "Last migration rolled back.\n";
                     break;
+                case 'migrate':
+                    $manager->migrate();
+                    echo "Migration applied.\n";
+                    break;
                 default:
                     echo "Invalid migration command.\n";
                     break;
