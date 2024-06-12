@@ -7,32 +7,33 @@
     use Jubilant\EmailSender;
     use Jubilant\Superglobals\Session;
     use Jubilant\Superglobals\Cookie;
+    use Jubilant\Lang;
 
     class UserAuth {
         private $con;
 
 
         public function __construct() {
-            require __DIR__.'/../settings.php';
+            require_once __DIR__.'/../settings.php';
             $this->con = new Database($DatabaseConnection[0], $DatabaseConnection[1], $DatabaseConnection[2], $DatabaseConnection[3]);
             $this->con->connect();
         }
 
         public function registerUser(string $username, string $email, string $password, string $sessionid,) {
-            require __DIR__.'/../settings.php';
+            require_once __DIR__.'/../settings.php';
             Session::init();
             if($sessionid == $_COOKIE['PHPSESSID']) {
                 if(empty($username)) {
-                    echo $emptyUsernameInput;
+                    echo Lang::trans('emptyUsernameInput');
                 } else if(empty($email)) {
-                    echo $emptyEmailInput;
+                    echo Lang::trans('emptyEmailInput');
                 } else if(empty($password)) {
                     echo $emptyPasswordInput;
                 } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    echo $notValidEmail;
+                    echo Lang::trans('notValidEmail');
                 } else {
                     if($this->con->select("users", "*","`email`='$email'")) {
-                        echo $emailAlredyUsed;
+                        echo Lang::trans('emailAlredyUsed');
                     } else {
                         $PasswordHash = new PasswordHash();
                         $RandomString = new RandomString();
@@ -49,13 +50,13 @@
                                 'email'         => $email,
                                 'registerDate'  => $date,
                                 'customID'      => $customID,
-                                'subject'       => $subjectForRegistration
+                                'subject'       => Lang::trans('subjectForRegistration')
                             ]);
-                            if($EmailSender->sendMail($email,$subjectForRegistration,$Template->render())) {
-                                echo $registeredSuccessfully;
+                            if($EmailSender->sendMail($email,Lang::trans('subjectForRegistration'),$Template->render())) {
+                                echo Lang::trans('registeredSuccessfully');
                             } else {
                                 $this->con->delete("users","`email`='$email' AND `customID`='$customID'");
-                                echo $registeredUnsuccessfully;
+                                echo Lang::trans('registeredUnsuccessfully');
                             }
     
                             return true;
@@ -63,7 +64,7 @@
                     }
                 }
             } else {
-                echo $invalidPHPsessionID;
+                echo Lang::trans('invalidPHPsessionID');
             }
 
             Session::regenerate();
@@ -71,7 +72,7 @@
         }
 
         public function loginUser(string $email, string $password, string $sessionID) {
-            require __DIR__.'/../settings.php';
+            require_once __DIR__.'/../settings.php';
             Session::init();
             if($sessionID === $_COOKIE['PHPSESSID']) {
                 $PasswordHash = new PasswordHash();
@@ -92,7 +93,7 @@
                         $userBrowser = $_SERVER['HTTP_USER_AGENT'];
     
                         if($this->con->select("lastLogins","*","`userCustomID`='$customID' AND `sessionBrowser`='$userBrowser'")) {
-                            echo $userLoginSuccessfully;
+                            echo Lang::trans('userLoginSuccessfully');
                             return true;
                         } else {
                             $userIP = $_SERVER['REMOTE_ADDR'];
@@ -108,10 +109,10 @@
                                         'browser'   => $userBrowser,
                                         'ip'        => $userIP,
                                         'date'      => date("Y-m-d H:i:s"),
-                                        'subject'   => $subjectForLoginFromNewDevice
+                                        'subject'   => Lang::trans('subjectForLoginFromNewDevice')
                                     ]);
 
-                                    $subject = $subjectForLoginFromNewDevice;
+                                    $subject = Lang::trans('subjectForLoginFromNewDevice');
                                     if($EmailSender->sendMail($email, $subject, $Template->render())) {
                                         echo $userLoginSuccessfully;
                                         $Session->regenerate();
@@ -121,15 +122,15 @@
                             }
                         }
                     } else {
-                        echo $invalidPassword;
+                        echo Lang::trans('invalidPassword');
                         return false;
                     }
                 } else {
-                    echo $userNotFound;
+                    echo Lang::trans('userNotFound');
                     return false;
                 }
             } else {
-                echo $invalidPHPsessionID;
+                echo Lang::trans('invalidPHPsessionID');
                 return false;
             }
     
@@ -140,7 +141,7 @@
         }
         
         public function changePassword(string $email, string $newPassword, string $sessionID,) {
-            require __DIR__.'/../settings.php';
+            require_once __DIR__.'/../settings.php';
             Session::init();
             if ($sessionID == $_COOKIE['PHPSESSID']) {
                 $PasswordHash = new PasswordHash();
@@ -151,18 +152,18 @@
                     $Template->var([
                         'email'     => $email,
                         'date'      => date("Y-m-d H:i:s"),
-                        'subject'   => $subjectForPasswordchange
+                        'subject'   => Lang::trans('subjectForPasswordchange')
                     ]);
 
-                    $EmailSender->sendMail($email, $subjectForPasswordchange, $Template->render());
-                    echo $passwordSuccessfullyChanged;
+                    $EmailSender->sendMail($email, Lang::trans('subjectForPasswordchange'), $Template->render());
+                    echo Lang::trans('passwordSuccessfullyChanged');
                     return true;
                 } else {
-                    echo $passwordUnsuccessfullyChanged;
+                    echo Lang::trans('passwordUnsuccessfullyChanged');
                     return false;
                 }
             } else {
-                echo $invalidPHPsessionID;
+                echo Lang::trans('invalidPHPsessionID');
                 return false;
             }
 
@@ -171,16 +172,16 @@
         }
 
         public function confAuth(string $customID) {
-            require __DIR__.'/../settings.php';
+            require_once __DIR__.'/../settings.php';
             if($this->con->select("users","*","`customID`='$customID' AND `status`='pending'")) {
                 if($this->con->update("users",array('status'=>"confirmed"),array('customID'=>$customID))) {
-                    echo $userConfirmedSuccessfully;
+                    echo Lang::trans('userConfirmedSuccessfully');
                 } else {
-                    echo $userConfirmedUnsuccessfully;
+                    echo Lang::trans('userConfirmedUnsuccessfully');
                     return false;
                 }
             } else {
-                echo $userNotFound;
+                echo Lang::trans('userNotFound');
                 return false;
             }
 

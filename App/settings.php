@@ -1,6 +1,6 @@
 <?php 
-    require __DIR__.'/../vendor/autoload.php';
-    require __DIR__.'/src/lessCompile.php';
+    require_once __DIR__.'/../vendor/autoload.php';
+    require_once __DIR__.'/src/lessCompile.php';
 
     use Jubilant\Superglobals\Dotenv;
 
@@ -9,7 +9,3 @@
 
     $Appname = Dotenv::get('APP_NAME');
     $language = Dotenv::get('APP_LANGUAGE');
-
-    require 'src/langs/'.$language.'.php';
-
-?>

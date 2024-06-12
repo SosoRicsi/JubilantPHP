@@ -33,7 +33,7 @@
             echo "Usage: php console $command <filename>\n";
         }
     } else {
-        echo "Usage: php console <command>\n";
+        echo "Usage: php jubil <command>\n";
         echo "Available commands:\n";
         foreach ($commands as $name => $instance) {
             echo "  - $name\n";

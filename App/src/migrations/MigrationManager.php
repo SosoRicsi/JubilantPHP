@@ -44,15 +44,13 @@ class MigrationManager {
     private function applyMigration($file) {
         $migration = basename($file, '.php');
 
-        if (!in_array($migration, $this->getAppliedMigrations())) {
-            require_once $file;
+        require_once $file;
 
-            $class = 'Migrations\\' . $migration;
-            $migrationInstance = new $class($this->db->getConnection());
-            $migrationInstance->up();
+        $class = 'Migrations\\' . $migration;
+        $migrationInstance = new $class($this->db->getConnection());
+        $migrationInstance->up();
 
-            $this->db->insert('migrations', [$migration], ['migration']);
-        }
+        $this->db->insert('migrations', [$migration], ['migration']);
     }
 
     private function revertMigration($migration) {

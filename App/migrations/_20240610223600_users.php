@@ -23,7 +23,7 @@
         }
 
         public function down() {
-            $query = "DROP TABLE users";
+            $query = "DROP TABLE IF EXISTS users";
             $this->con->query($query);
         }
 

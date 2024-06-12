@@ -4,6 +4,7 @@
     
     use Jubilant\RandomString;
     use Jubilant\Database;
+    use Jubilant\Lang;
     
     class FileUpload {
         private string $targetDirectory;
@@ -11,18 +12,18 @@
         private array $allowedFileTypes = [];
         
         public function __construct(string $targetDirectory, array $allowedFileTypes = ["jpg", "png", "gif"], $maxFileSize = 500000) {
-            require __DIR__.'/../settings.php';
+            require_once __DIR__.'/../settings.php';
             if($targetDirectory != null) {
                 $this->targetDirectory = $targetDirectory;
                 $this->allowedFileTypes = $allowedFileTypes;
                 $this->maxFileSize = $maxFileSize;
             } else {
-                echo $emptyUploadDirectory;
+                echo Lang::trans('emptyUploadDirectory');
             }
         }
         
         private function createUploadedFilesTable() {
-            require __DIR__.'/../settings.php';
+            require_once __DIR__.'/../settings.php';
             $Database = new Database($DatabaseConnection[0], $DatabaseConnection[1], $DatabaseConnection[2], $DatabaseConnection[3]);
             $Database->connect();
 
@@ -35,25 +36,25 @@
             )";
 
             if(!$Database->getConnection()->query($query)) {
-                return $cantCreateFileUploadsTableError;
+                return Lang::trans('cantCreateFileUploadsTableError');
             }
 
             return true;
         }
 
         public function upload($file, ?bool $customFileName = false, ?bool $uploadToDatabase = false, ?string $fileCustomID = null) {
-            require __DIR__.'/../settings.php';
+            require_once __DIR__.'/../settings.php';
             $Database = new Database($DatabaseConnection[0], $DatabaseConnection[1], $DatabaseConnection[2], $DatabaseConnection[3]);
             $Database->connect();
             $RandomString = new RandomString();
             $fileType = strtolower(pathinfo($file["name"], PATHINFO_EXTENSION));
 
             if($file["size"] > $this->maxFileSize) {
-                echo $tooBigFilesize;
+                echo Lang::trans('tooBigFilesize');
                 return false;
             }
             if(!in_array($fileType, $this->allowedFileTypes)) {
-                echo $inaptFileFormat;
+                echo Lang::trans('inaptFileFormat');
                 return false;
             }
 
@@ -73,9 +74,9 @@
             }
 
             if(move_uploaded_file($file["tmp_name"], $targetFile)) {
-                echo $fileUploadedSuccessfully;
+                return Lang::trans('fileUploadedSuccessfully');
             } else {
-                echo $fileUploadedUnsuccessfully;
+                return Lang::trans('fileUploadedUnsuccessfully');
             }
 
             return true;

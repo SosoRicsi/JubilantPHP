@@ -3,13 +3,14 @@
 
     use PHPMailer\PHPMailer\PHPMailer;
     use PHPMailer\PHPMailer\Exception;
+    use Jubilant\Lang;
 
     class EmailSender {
 
         private $mailer;
 
         public function __construct($senderName = 'JubilantPHP EmailSender system') {
-            require __DIR__.'/../settings.php';
+            require_once __DIR__.'/../settings.php';
 
             $this->mailer = new PHPMailer(true);
 
@@ -37,9 +38,9 @@
                 $this->mailer->Subject = "=?UTF-8?B?".base64_encode($subject)."?=";
     
                 $this->mailer->send();
-                echo 'Message has been sent! <br>';
+                return Lang::trans('emailSuccessfullySent');
             } catch (Exception $e) {
-                throw new Exception("An error occurred while sending the email: ".$this->mailer->ErrorInfo."<br>");
+                throw new Exception(Lang::trans('cantSendEmail').$this->mailer->ErrorInfo."<br>");
             }
             return true;
         }

@@ -1,5 +1,5 @@
 <?php 
-    require __DIR__.'/../settings.php';
+    require_once __DIR__.'/../settings.php';
 
     use Jubilant\Router;
     use Jubilant\Template;
@@ -13,6 +13,7 @@
     $Template = new Template();
 
     $Router->set('/', 'index', 'index');
+    $Router->set('/login', 'home', 'inde');
 
     $Router->get('/', function ($params, $Template) use ($Appname, $language) {
         $Template->var([

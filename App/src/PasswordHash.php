@@ -15,30 +15,30 @@
         }
 
         public function isPasswordStrong($password, $minLenght = 8) {
-            require __DIR__.'/../settings.php';
+            require_once __DIR__.'/../settings.php';
             
             if(strlen($password) < $minLenght) {
-                return $passwordMinimumCharError.$minLenght;
+                echo Lang::trans('passwordMinimumCharError').$minLenght;
                 return false;
             }
 
             if(!preg_match('/[A-Z]/', $password)) {
-                return $passwordLeastOneUppercase;
+                echo Lang::trans('passwordLeastOneUppercase');
                 return false;
             }
 
             if(!preg_match('/[a-z]/', $password)) {
-                return $passwordLeastOneLowercase;
+                echo Lang::trans('passwordLeastOneLowercase');
                 return false;
             }
 
             if(!preg_match('/[0-9]/', $password)) {
-               return $passwordLeastOneNumber;
+                echo Lang::trans('passwordLeastOneNumber');
                 return false;
             }
 
             if(!preg_match('/[!@$&_]/', $password)) {
-                return $passwordLeastOneSpecialChar.' (!@$&_)';
+                echo Lang::trans('passwordLeastOneSpecialChar').' (!@$&_)';
                 return false;
             }
 

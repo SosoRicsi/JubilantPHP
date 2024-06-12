@@ -48,3 +48,10 @@
     $inaptFileFormat                    = "Ugyldig filformat! <br>";
     $fileUploadedSuccessfully           = "Filen ble lastet opp! <br>";
     $fileUploadedUnsuccessfully         = "Kunne ikke laste opp filen! <br>";
+
+                                                    /* Email sender */
+    $emailSuccessfullySent              = "E-posten er sendt vellykket. <br>";
+    $cantSendEmail                      = "Det oppstod en feil under sending av e-posten: ";
+
+                                                    /* Less compiler */
+    $pathDoesntExists                   = "Den angitte banen eksisterer ikke: ";

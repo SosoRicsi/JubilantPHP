@@ -1,9 +1,11 @@
 <?php 
-    require __DIR__.'/../../vendor/autoload.php';
+    require_once __DIR__.'/../../vendor/autoload.php';
+
+    use Jubilant\Lang;
 
     function getLessFiles($directory = __DIR__.'/../styles/') {
         if (!is_dir($directory)) {
-            throw new InvalidArgumentException("A megadott könyvtár nem létezik: $directory");
+            throw new InvalidArgumentException(Lang::trans('pathDoesntExists').$directory);
         }
 
         $lessFiles = [];
