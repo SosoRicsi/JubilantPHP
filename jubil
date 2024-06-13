@@ -2,14 +2,14 @@
 
     /* 
     *
-    *   @JubilantPHP  --- Made by Jarkó Richárd
+    *   @JubilantPHP  --- Jarkó Richárd production
     *   command file
     *
     */
 
     require __DIR__.'/vendor/autoload.php';
 
-    use Jubilant\commands\CreateNewView;
+    use Jubilant\commands\CreateNewMVC;
     use Jubilant\commands\CreateNewMigration;
     use Jubilant\commands\Migrate;
     use Jubilant\Database;
@@ -17,7 +17,7 @@
     $db = new Database();
 
     $commands = [
-        'create-view'       => new CreateNewView(),
+        'create-mvc'       => new CreateNewMVC(),
         'create-migration'  => new CreateNewMigration(),
         'migrate'           => new Migrate($db)
     ];

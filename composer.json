@@ -8,7 +8,10 @@
             "Jubilant\\": "App/src/",
             "Jubilant\\Superglobals\\": "App/src/superglobs/",
             "Jubilant\\commands\\": "App/src/commands/",
-            "Jubilant\\Migration\\": "App/src/migrations/"
+            "Jubilant\\Migration\\": "App/src/migrations/",
+
+            "App\\Models\\": "App/public/mvc/models/",
+            "App\\Controllers\\": "App/public/mvc/controllers/"
         }
     },
     "authors": [

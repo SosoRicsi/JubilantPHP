@@ -1,114 +1,90 @@
 <?php
-    declare(strict_types=1);
-    namespace Jubilant;
+declare(strict_types=1);
 
-    use Jubilant\Template;
+namespace Jubilant;
 
-    class Router {
-        private array $handlers = [];
-        private array $directory = [];
-        private array $styles = [];
-        private $notFoundHandler;
-        private $dinamicErrorHandler;
-        private const METHOD_POST = 'POST';
-        private const METHOD_GET = 'GET';
+class Router {
+    private array $routes = [];
+    private $notFoundHandler;
 
-        public function set($route, $template, $css) {
-            if($template === null) {
-                $this->directory[$route] = null;
-            } else {
-                $this->directory[$route] = __DIR__.'/../public/templates/views/'.$template.'.blade.php';
-                $this->styles[$route] = __DIR__.'/../styles/css/'.$css.'.style.css';
-            }
+    private const METHOD_GET = 'GET';
+    private const METHOD_POST = 'POST';
+
+    public function get(string $path, $handler): void {
+        $this->addRoute(self::METHOD_GET, $path, $handler);
+    }
+
+    public function post(string $path, $handler): void {
+        $this->addRoute(self::METHOD_POST, $path, $handler);
+    }
+
+    public function add404Handler($handler): void {
+        $this->notFoundHandler = $handler;
+    }
+
+    private function addRoute(string $method, string $path, $handler): void {
+        $this->routes[] = [
+            'method' => $method,
+            'path' => $path,
+            'handler' => $handler,
+        ];
+    }
+
+    private function match(string $requestPath, string $path, array &$params): bool {
+        $pathParts = explode('/', trim($path, '/'));
+        $requestParts = explode('/', trim($requestPath, '/'));
+
+        if (count($pathParts) !== count($requestParts)) {
+            return false;
         }
 
-        private function getDirectory($route) {
-            return $this->directory[$route] ?? null;
-        }
-
-        public function get(string $path, $handler, ?bool $css = true): void {
-            $template = $this->getDirectory($path);
-            if($css != false) {
-                $css = $this->styles[$path];
-            }
-            $css == true ? $css = $this->styles[$path] : $css = null;
-            $this->addHandler(self::METHOD_GET, $path, $template, $handler, $css);
-        }
-
-        public function post(string $path, $handler): void {
-            $this->addHandler(self::METHOD_POST, $path, null, $handler);
-        }
-
-        public function add404Handler($handler): void {
-            $this->notFoundHandler = $handler;
-        }
-
-        private function addHandler(string $method, string $path, ?string $template, $handler, $css = ''): void {
-            $this->handlers[] = [
-                'path' => $path,
-                'method' => $method,
-                'template' => $template,
-                'handler' => $handler,
-                'css' => $css
-            ];
-        }
-
-        private function match(string $requestPath, string $path, array &$params): bool {
-            $pathParts = explode('/', trim($path, '/'));
-            $requestParts = explode('/', trim($requestPath, '/'));
-
-            if (strpos($path, '{') === false && count($pathParts) !== count($requestParts)) {
-                $this->dinamicErrorHandler = 'disabled';
+        foreach ($pathParts as $index => $part) {
+            if (strpos($part, '{') === 0 && strpos($part, '}') === strlen($part) - 1) {
+                $paramName = substr($part, 1, -1);
+                $params[$paramName] = $requestParts[$index];
+            } elseif ($part !== $requestParts[$index]) {
                 return false;
             }
+        }
+        return true;
+    }
 
-            foreach ($pathParts as $index => $part) {
-                if (!isset($requestParts[$index])) {
-                    return false;
-                }
+    public function run() {
+        $requestUri = parse_url($_SERVER['REQUEST_URI']);
+        $requestPath = $requestUri['path'];
+        $method = $_SERVER['REQUEST_METHOD'];
 
-                if (strpos($part, '{') === 0 && strpos($part, '}') === strlen($part) - 1) {
-                    $paramName = substr($part, 1, -1);
-                    $params[$paramName] = $requestParts[$index];
-                } elseif ($part !== $requestParts[$index]) {
-                    return false;
-                }
+        $callback = null;
+        $params = [];
+
+        foreach ($this->routes as $route) {
+            if ($route['method'] === $method && $this->match($requestPath, $route['path'], $params)) {
+                $callback = $route['handler'];
+                break;
             }
-            return true;
         }
 
-        public function run() {
-            $requestUri = parse_url($_SERVER['REQUEST_URI']);
-            $requestPath = $requestUri['path'];
-            $method = $_SERVER['REQUEST_METHOD'];
+        if (!$callback) {
+            header("HTTP/1.0 404 Not Found");
+            if ($this->notFoundHandler) {
+                call_user_func($this->notFoundHandler);
+            } else {
+                echo '404 Not Found';
+            }
+            return;
+        }
 
-            $callback = null;
-            $params = [];
-            $template = null;
-
-            foreach ($this->handlers as $handler) {
-                if ($handler['method'] === $method && $this->match($requestPath, $handler['path'], $params)) {
-                    $callback = $handler['handler'];
-                    $template = $handler['template'];
-                    $css = $handler['css'];
-                    break;
+        if (is_array($callback)) {
+            [$controller, $method] = $callback;
+            if (class_exists($controller)) {
+                $controller = new $controller();
+                if (method_exists($controller, $method)) {
+                    call_user_func_array([$controller, $method], $params);
+                    return;
                 }
             }
-
-            if (!$callback) {
-                header("HTTP/1.0 404 Not Found");
-                call_user_func($this->notFoundHandler);
-                return;
-            }
-
-            if ($template && $handler['template'] != null) {
-                $Template = new Template($template);
-                $css != null ? $Template->css($css) : null;
-                call_user_func_array($callback, [$params, $Template]);
-                echo $Template->render();
-            } else {
-                call_user_func_array($callback, [$params]);
-            }
+        } else {
+            call_user_func_array($callback, $params);
         }
     }
-?>
+}

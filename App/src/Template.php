@@ -6,7 +6,7 @@ class Template {
     private $cssPath;
     private $variables = [];
 
-    public function __construct($templatePath = '') {
+    public function __construct($templatePath) {
         $this->templatePath = $templatePath;
     }
 
@@ -38,7 +38,6 @@ class Template {
         }
 
         $content = str_replace('@hw','Hello, World!',$content);
-        $content = str_replace('@css', '<?php echo "<style>".file_get_contents($this->cssPath)."</style>" ?>', $content);
         if(file_exists(__DIR__.'/../styles/css/main.css')) {
             $mainCss = file_get_contents(__DIR__.'/../styles/css/main.css');
             $content = str_replace('@mainCss', '<?php echo "<style>".$mainCss."</style>" ?>', $content);
@@ -62,7 +61,7 @@ class Template {
 
             $variables = isset($matches[2]) ? 'array('.$matches[2].')' : 'array()';
 
-            return '<?php '.$templateVar.' = new \Jubilant\Template("'.__DIR__.'/../public/templates/views/'.$matches[1].'.blade.php");'.$templateVar.'->var('.$variables.'); echo '.$templateVar.'->render(); ?>';
+            return '<?php '.$templateVar.' = new \Jubilant\Template("'.__DIR__.'/../public/MVC/views/'.$matches[1].'.blade.php");'.$templateVar.'->var('.$variables.'); echo '.$templateVar.'->render(); ?>';
         }, $content);
         return $content;
     }
