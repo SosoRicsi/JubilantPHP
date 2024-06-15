@@ -11,8 +11,6 @@
             <h1 class="text-5 jubilant-logo">JubilantPHP | {{name}}</h1>
             <h2 class="text-3 text-white">A very simple PHP framework, for simple web apps. </h2>
             <a class="btn btn-info" href="https://github.com/SosoRicsi/JubilantPHP">Github</a><br><br>
-            <a href="/register" class="btn btn-success">Regisztráció</a>
-            <a href="/login" class="btn btn-success">Bejelentkezés</a>
         </div>
     </body>
 </html>

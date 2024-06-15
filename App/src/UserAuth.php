@@ -40,6 +40,9 @@
             
                         $hashedPassword = $PasswordHash->passwordHash($password);
                         $customID = $RandomString->generateCustomString('ucid',3,5);
+
+                        $username = htmlspecialchars($customID);
+                        $email = htmlspecialchars($email);
             
                         if($this->con->insert("users",array("$customID","$username","$email","$hashedPassword","pending"),array("customID","username","email","password","status"))) {
                             $EmailSender = new EmailSender($EmailServer[0],$EmailServer[1],$EmailServer[2],$EmailServer[3],$EmailServer[4]);

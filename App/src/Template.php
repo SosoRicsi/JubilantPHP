@@ -28,14 +28,15 @@ class Template {
 
         $content = $this->processTemplates($content);
 
-        $if = $content = preg_replace('/@if\(\s*(.+?)\s*\)/', '<?php if($1): ?>', $content);
-        $if = $content = preg_replace('/@if \(\s*(.+?)\s*\)/', '<?php if($1): ?>', $content);
-        if($if != '') {
-            $content = preg_replace('/@elseif\(\s*(.+?)\s*\)/', '<?php elseif($1): ?>', $content);
-            $content = preg_replace('/@elseif \(\s*(.+?)\s*\)/', '<?php elseif($1): ?>', $content);
-            $content = str_replace('@else', '<?php else: ?>', $content);
-            $content = str_replace('@endif', '<?php endif; ?>', $content);    
-        }
+        $content = preg_replace('/@if\(\s*(.+?)\s*\)/', '<?php if($1): ?>', $content);
+        $content = preg_replace('/@if \(\s*(.+?)\s*\)/', '<?php if($1): ?>', $content);
+        $content = preg_replace('/@elseif\(\s*(.+?)\s*\)/', '<?php elseif($1): ?>', $content);
+        $content = preg_replace('/@elseif \(\s*(.+?)\s*\)/', '<?php elseif($1): ?>', $content);
+        $content = str_replace('@else', '<?php else: ?>', $content);
+        $content = str_replace('@endif', '<?php endif; ?>', $content);    
+
+        $content = preg_replace('/@for\(\s*(.+?)\s*\)/', '<?php for ($1): ?>', $content);
+        $content = str_replace('@endfor', '<?php endfor; ?>', $content);
 
         $content = str_replace('@hw','Hello, World!',$content);
         if(file_exists(__DIR__.'/../styles/css/main.css')) {
