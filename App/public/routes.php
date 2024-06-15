@@ -9,7 +9,6 @@
     use Jubilant\Router;
     use Jubilant\Template;
 
-    use App\Controllers\HomeController;
     use App\Controllers\IndexController;
 
     $Router = new Router();
