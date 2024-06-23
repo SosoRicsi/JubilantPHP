@@ -3,6 +3,7 @@
     namespace App\Controllers;
 
     use Jubilant\Template;
+    use Jubilant\Superglobals\Session;
 
     use App\Models\Index;
     class IndexController {
@@ -10,6 +11,7 @@
 
         public function __construct() {
             $this->model = new Index();
+            Session::init();
         }
 
         public function index() {

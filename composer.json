@@ -9,9 +9,11 @@
             "Jubilant\\Superglobals\\": "App/src/superglobs/",
             "Jubilant\\commands\\": "App/src/commands/",
             "Jubilant\\Migration\\": "App/src/migrations/",
+            "Jubilant\\Interface\\": "App/src/interfaces/",
 
             "App\\Models\\": "App/public/mvc/models/",
-            "App\\Controllers\\": "App/public/mvc/controllers/"
+            "App\\Controllers\\": "App/public/mvc/controllers/",
+            "App\\Middlewares\\": "App/middlewares/"
         }
     },
     "authors": [

@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 namespace Jubilant;
 
@@ -10,23 +9,24 @@ class Router {
     private const METHOD_GET = 'GET';
     private const METHOD_POST = 'POST';
 
-    public function get(string $path, $handler): void {
-        $this->addRoute(self::METHOD_GET, $path, $handler);
+    public function get(string $path, $handler, $middleware = null): void {
+        $this->addRoute(self::METHOD_GET, $path, $handler, $middleware);
     }
 
-    public function post(string $path, $handler): void {
-        $this->addRoute(self::METHOD_POST, $path, $handler);
+    public function post(string $path, $handler, $middleware = null): void {
+        $this->addRoute(self::METHOD_POST, $path, $handler, $middleware);
     }
 
     public function add404Handler($handler): void {
         $this->notFoundHandler = $handler;
     }
 
-    private function addRoute(string $method, string $path, $handler): void {
+    private function addRoute(string $method, string $path, $handler, $middleware = null): void {
         $this->routes[] = [
             'method' => $method,
             'path' => $path,
             'handler' => $handler,
+            'middleware' => $middleware,
         ];
     }
 
@@ -49,6 +49,21 @@ class Router {
         return true;
     }
 
+    private function executeMiddleware($middleware): bool {
+        if (is_array($middleware)) {
+            [$class, $method] = $middleware;
+            if (class_exists($class)) {
+                $instance = new $class();
+                if (method_exists($instance, $method)) {
+                    return (bool) call_user_func([$instance, $method]);
+                }
+            }
+        } elseif ($middleware instanceof \Closure) {
+            return (bool) $middleware();
+        }
+        return true;
+    }
+
     public function run() {
         $requestUri = parse_url($_SERVER['REQUEST_URI']);
         $requestPath = $requestUri['path'];
@@ -59,8 +74,12 @@ class Router {
 
         foreach ($this->routes as $route) {
             if ($route['method'] === $method && $this->match($requestPath, $route['path'], $params)) {
-                $callback = $route['handler'];
-                break;
+                if ($route['middleware'] === null || $this->executeMiddleware($route['middleware'])) {
+                    $callback = $route['handler'];
+                    break;
+                } else {
+                    return;
+                }
             }
         }
 
@@ -83,7 +102,7 @@ class Router {
                     return;
                 }
             }
-        } else {
+        } elseif ($callback instanceof \Closure) {
             call_user_func_array($callback, $params);
         }
     }
