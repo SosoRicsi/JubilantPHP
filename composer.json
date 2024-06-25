@@ -29,9 +29,17 @@
     ],
     "minimum-stability": "stable",
     "post-install-cmd": [
-        "cp -r vendor/jubilant/jubilantphp/* ."
+        "echo 'Post-install script running!'",
+        "cp -r vendor/jubilant/jubilantphp/* .",
+        "cp -r vendor/jubilant/jubilantphp/.htaccess .",
+        "cp -r vendor/jubilant/jubilantphp/.env.example .",
+        "cp -r vendor/jubilant/jubilantphp/jubil ."
     ],
     "post-update-cmd": [
-        "cp -r vendor/jubilant/jubilantphp/* ."
+        "echo 'Post-update script running!'",
+        "cp -r vendor/jubilant/jubilantphp/* .",
+        "cp -r vendor/jubilant/jubilantphp/.htaccess .",
+        "cp -r vendor/jubilant/jubilantphp/.env.example .",
+        "cp -r vendor/jubilant/jubilantphp/jubil ."
     ]
 }
