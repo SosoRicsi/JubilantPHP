@@ -28,6 +28,38 @@ class Template {
 
         $content = $this->processTemplates($content);
 
+        // Markdown címek kezelése
+        $content = preg_replace('/(|\n)# (.+)/', '$1<h1>$2</h1>', $content);
+        $content = preg_replace('/(|\n)## (.+)/', '$1<h2>$2</h2>', $content);
+        $content = preg_replace('/(|\n)### (.+)/', '$1<h3>$2</h3>', $content);
+        $content = preg_replace('/(|\n)#### (.+)/', '$1<h4>$2</h4>', $content);
+        $content = preg_replace('/(|\n)##### (.+)/', '$1<h5>$2</h5>', $content);
+        $content = preg_replace('/(|\n)###### (.+)/', '$1<h6>$2</h6>', $content);
+
+        // Félkövér és dőlt szöveg
+        $content = preg_replace('/(\*\*|__)(.*?)\1/', '<strong>$2</strong>', $content); // félkövér
+        $content = preg_replace('/(\*|_)(.*?)\1/', '<em>$2</em>', $content); // dőlt
+
+        // Link (inline)
+        $content = preg_replace('/\[([^\]]+)\]\(([^)]+)\)/', '<a href="$2">$1</a>', $content);
+
+        // Kép
+        $content = preg_replace('/!\[([^\]]+)\]\(([^)]+)\)/', '<img src="$2" alt="$1">', $content);
+
+        // Unordered list
+        $content = preg_replace('/\* (.+)/m', '<li>$1</li>', $content);
+
+        // Ordered list
+        $content = preg_replace('/\d+\. (.+)/m', '<li>$1</li>', $content);
+
+        // Kódblokk
+        $content = preg_replace('/```(.+?)```/s', '<pre><code>$1</code></pre>', $content);
+
+        // Blockquote
+        $content = preg_replace('/\> (.+)/m', '<blockquote>$1</blockquote>', $content);
+
+
+        /* blade elements */
         $content = preg_replace('/@if\(\s*(.+?)\s*\)/', '<?php if($1): ?>', $content);
         $content = preg_replace('/@if \(\s*(.+?)\s*\)/', '<?php if($1): ?>', $content);
         $content = preg_replace('/@elseif\(\s*(.+?)\s*\)/', '<?php elseif($1): ?>', $content);

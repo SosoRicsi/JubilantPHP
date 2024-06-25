@@ -20,7 +20,6 @@
             "email": "jarkoricsi16@gmail.com"
         }
     ],
-    "minimum-stability": "stable",
     "require": {
         "phpmailer/phpmailer": "^6.9",
         "oyejorge/less.php": "v1.7.0.14"
