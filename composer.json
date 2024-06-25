@@ -29,10 +29,9 @@
     ],
     "minimum-stability": "stable",
     "post-install-cmd": [
-            "cp -r vendor/jubilant/jubilantphp/* ."
-        ],
-        "post-update-cmd": [
-            "cp -r vendor/jubilant/jubilantphp/* ."
-        ]
-    }
+        "cp -r vendor/jubilant/jubilantphp/* ."
+    ],
+    "post-update-cmd": [
+        "cp -r vendor/jubilant/jubilantphp/* ."
+    ]
 }
