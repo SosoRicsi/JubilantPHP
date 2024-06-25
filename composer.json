@@ -22,24 +22,11 @@
     ],
     "require": {
         "phpmailer/phpmailer": "^6.9",
-        "oyejorge/less.php": "v1.7.0.14"
+        "oyejorge/less.php": "v1.7.0.14",
+        "jubilant/installer-plugin": "dev-main"
     },
     "bin": [
         "jubil"
     ],
-    "minimum-stability": "stable",
-    "post-install-cmd": [
-        "echo 'Post-install script running!'",
-        "cp -r vendor/jubilant/jubilantphp/* .",
-        "cp -r vendor/jubilant/jubilantphp/.htaccess .",
-        "cp -r vendor/jubilant/jubilantphp/.env.example .",
-        "cp -r vendor/jubilant/jubilantphp/jubil ."
-    ],
-    "post-update-cmd": [
-        "echo 'Post-update script running!'",
-        "cp -r vendor/jubilant/jubilantphp/* .",
-        "cp -r vendor/jubilant/jubilantphp/.htaccess .",
-        "cp -r vendor/jubilant/jubilantphp/.env.example .",
-        "cp -r vendor/jubilant/jubilantphp/jubil ."
-    ]
+    "minimum-stability": "stable"
 }
