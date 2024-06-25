@@ -14,9 +14,6 @@
     $Router = new Router();
 
     $Router->get('/', [IndexController::class, 'index']);
-    $Router->get('/{name}', function ($name) {
-        echo $name;
-    });
 
     $Router->add404Handler(function () {
         $Template = new Template(__DIR__.'/MVC/views/404.blade.php');
