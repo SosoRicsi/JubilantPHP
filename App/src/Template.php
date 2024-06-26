@@ -94,7 +94,9 @@ class Template {
 
             $variables = isset($matches[2]) ? 'array('.$matches[2].')' : 'array()';
 
-            return '<?php '.$templateVar.' = new \Jubilant\Template("'.__DIR__.'/../public/MVC/views/'.$matches[1].'.blade.php");'.$templateVar.'->var('.$variables.'); echo '.$templateVar.'->render(); ?>';
+            $filePath = str_replace('\\', '/', dirname(__DIR__).'/public/MVC/views/'.$matches[1].'.blade.php');
+
+            return '<?php '.$templateVar.' = new \Jubilant\Template("'.$filePath.'");'.$templateVar.'->var('.$variables.'); echo '.$templateVar.'->render(); ?>';
         }, $content);
         return $content;
     }
