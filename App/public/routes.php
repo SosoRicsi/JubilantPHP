@@ -6,16 +6,17 @@
     *
     */
 
-    use Jubilant\Router;
     use Jubilant\Template;
 
     use App\Controllers\IndexController;
+    use App\Middlewares\Auth;
 
-    $Router = new Router();
+    $Application->router->get('/', [IndexController::class, 'index'], [Auth::class]);
+    $Application->router->get('/alma', function () {
+        echo "oksa";
+    }, [Auth::class]);
 
-    $Router->get('/', [IndexController::class, 'index']);
-
-    $Router->add404Handler(function () {
+    $Application->router->add404Handler(function () {
         $Template = new Template(__DIR__.'/MVC/views/404.blade.php');
         $Template->var([
             'error'=>"404"

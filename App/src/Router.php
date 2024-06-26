@@ -10,23 +10,32 @@
         private const METHOD_GET = 'GET';
         private const METHOD_POST = 'POST';
 
-        public function get(string $path, $handler): void {
-            $this->addRoute(self::METHOD_GET, $path, $handler);
+        public function get(string $path, mixed $handler, ?array $middleware = null): void {
+            if($middleware === null) {
+                $this->addRoute(self::METHOD_GET, $path, $handler);
+            } else {
+                $this->addRoute(self::METHOD_GET, $path, $handler, $middleware);
+            }
         }
 
-        public function post(string $path, $handler): void {
-            $this->addRoute(self::METHOD_POST, $path, $handler);
+        public function post(string $path, mixed $handler, ?array $middleware = null): void {
+            if($middleware === null) {
+                $this->addRoute(self::METHOD_POST, $path, $handler);
+            } else {
+                $this->addRoute(self::METHOD_POST, $path, $handler, $middleware);
+            }
         }
 
         public function add404Handler($handler): void {
             $this->notFoundHandler = $handler;
         }
 
-        private function addRoute(string $method, string $path, $handler): void {
+        private function addRoute(string $method, string $path, mixed $handler, array $middleware = []): void {
             $this->routes[] = [
                 'method' => $method,
                 'path' => $path,
                 'handler' => $handler,
+                'middleware' => $middleware
             ];
         }
 
@@ -59,6 +68,12 @@
 
             foreach ($this->routes as $route) {
                 if ($route['method'] === $method && $this->match($requestPath, $route['path'], $params)) {
+                    foreach ($route['middleware'] as $middleware) {
+                        $middlewareInstance = new $middleware;
+                        if(!$middlewareInstance->handle($route['path'], $route['method'])) {
+                            return $this->notFoundHandler;
+                        }
+                    }
                     $callback = $route['handler'];
                     break;
                 }

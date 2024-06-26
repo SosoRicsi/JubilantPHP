@@ -12,21 +12,23 @@
     use Jubilant\commands\CreateNewMVC;
     use Jubilant\commands\CreateNewMigration;
     use Jubilant\commands\Migrate;
+    use Jubilant\commands\RunDevServer;
     use Jubilant\Database;
 
     $db = new Database();
 
     $commands = [
-        'create-mvc'       => new CreateNewMVC(),
+        'create-mvc'        => new CreateNewMVC(),
         'create-migration'  => new CreateNewMigration(),
-        'migrate'           => new Migrate($db)
+        'migrate'           => new Migrate($db),
+        'run-dev'           => new RunDevServer()
     ];
 
     $command = $argv[1] ?? null;
     $filename = $argv[2] ?? null;
 
     if ($command && isset($commands[$command])) {
-        if ($filename) {
+        if ($filename || $command === 'run-dev') {
             echo $filename."\n";
             $commands[$command]->run($filename);
         } else {

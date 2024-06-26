@@ -11,7 +11,9 @@
             "Jubilant\\Migration\\": "App/src/migrations/",
 
             "App\\Models\\": "App/public/mvc/models/",
-            "App\\Controllers\\": "App/public/mvc/controllers/"
+            "App\\Controllers\\": "App/public/mvc/controllers/",
+            "App\\Interfaces\\": "App/src/interfaces/",
+            "App\\Middlewares\\": "App/middlewares/"
         }
     },
     "authors": [
