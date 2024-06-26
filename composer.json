@@ -22,8 +22,7 @@
     ],
     "require": {
         "phpmailer/phpmailer": "^6.9",
-        "oyejorge/less.php": "v1.7.0.14",
-        "jubilant/installer-plugin": "dev-main"
+        "oyejorge/less.php": "v1.7.0.14"
     },
     "bin": [
         "jubil"
