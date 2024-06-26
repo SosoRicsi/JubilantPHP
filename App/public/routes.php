@@ -12,9 +12,6 @@
     use App\Middlewares\Auth;
 
     $Application->router->get('/', [IndexController::class, 'index'], [Auth::class]);
-    $Application->router->get('/alma', function () {
-        echo "oksa";
-    }, [Auth::class]);
 
     $Application->router->add404Handler(function () {
         $Template = new Template(__DIR__.'/MVC/views/404.blade.php');

@@ -14,7 +14,7 @@
 
         public function index() {
             $Template = new Template(__DIR__.'/../views/index.blade.php');
-            $name = $this->model->randomName('Hülye Flóra');
+            $name = $this->model->randomName('Banános Joe');
             if($name != null) {
                 $Template->var([
                     'appName'   => "JubilantPHP",
