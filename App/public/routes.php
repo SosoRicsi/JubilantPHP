@@ -11,7 +11,9 @@
     use App\Controllers\IndexController;
     use App\Middlewares\Auth;
 
-    $Application->router->get('/', [IndexController::class, 'index'], [Auth::class]);
+    //with auth middleware:
+    //$Application->router->get('/', [IndexController::class, 'index'], [Auth::class]);
+    $Application->router->get('/', [IndexController::class, 'index']);
 
     $Application->router->add404Handler(function () {
         $Template = new Template(__DIR__.'/MVC/views/404.blade.php');
